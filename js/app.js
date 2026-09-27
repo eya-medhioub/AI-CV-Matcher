@@ -127,7 +127,7 @@ function compareSkills(requiredSkills, candidateSkills) {
 // 6) Fonction : comparer l'expérience demandée et l'expérience du candidat
 // ---------------------------------------------------------
 // On compare le niveau d'expérience mentionné dans l'offre et dans le CV.
-// L’objectif est d’aider à l’analyse, pas de décider automatiquement.
+// L'objectif est d'aider à l'analyse, pas de décider automatiquement.
 function compareExperience(requiredText, candidateText) {
   const requiredExp = extractExperienceLevel(requiredText);
   const candidateExp = extractExperienceLevel(candidateText);
@@ -149,7 +149,7 @@ function compareExperience(requiredText, candidateText) {
 // ---------------------------------------------------------
 // 7) Fonction : calculer le score de correspondance
 // ---------------------------------------------------------
-// Le score est un indicateur d’aide à l’analyse.
+// Le score est un indicateur d'aide à l'analyse.
 // Il n'est pas une décision automatique de recrutement.
 function calculateMatchScore(requiredSkills, candidateSkills, experienceMatch) {
   const totalSkills = requiredSkills.length || 1;
@@ -188,7 +188,7 @@ function analyzeCVMatch(jobDescription, cvText) {
     missingSkills: comparison.missingSkills,
     experience: experienceComparison,
     score,
-    interpretation: 'Indicateur d’aide à l’analyse et non une décision automatique de recrutement.'
+    interpretation: 'Indicateur d'aide à l'analyse et non une décision automatique de recrutement.'
   };
 }
 
@@ -196,11 +196,12 @@ function analyzeCVMatch(jobDescription, cvText) {
 // 9) Fonction : afficher les résultats du dashboard
 // ---------------------------------------------------------
 // Cette fonction met à jour le DOM pour afficher les résultats de l'analyse.
-function renderResults(resultData) {
-  const resultPanel = document.getElementById('resultPanel');
+// CORRECTION : utilise #candidateGrid au lieu de #resultPanel
+function displayMatchResults(resultData) {
+  const candidateGrid = document.getElementById('candidateGrid');
 
-  if (!resultPanel) {
-    console.log('Aucun conteneur #resultPanel trouvé.');
+  if (!candidateGrid) {
+    console.error('Conteneur #candidateGrid introuvable.');
     return;
   }
 
@@ -212,57 +213,72 @@ function renderResults(resultData) {
     ? resultData.missingSkills.map((skill) => `<span class="skill-pill missing">${skill}</span>`).join('')
     : `<span class="skill-pill match">Aucune compétence manquante</span>`;
 
-  resultPanel.innerHTML = `
-    <div class="result-card">
-      <div class="result-header">
-        <h3>Résultat de l’analyse</h3>
+  // Affichage dans une seule carte pour l'analyse CV/Offre
+  candidateGrid.innerHTML = `
+    <article class="candidate-card">
+      <div class="candidate-header">
+        <div class="candidate-name">Résultat de l'analyse</div>
         <span class="score-badge">${resultData.score}%</span>
       </div>
 
-      <div class="result-score-note">
-        <strong>Score indicatif :</strong>
-        <span>${resultData.score}%</span>
+      <div class="level">
+        <span class="dot"></span>
+        <span>${resultData.experience.status}</span>
       </div>
 
-      <div class="result-meta">
-        <p><strong>Expérience :</strong> ${resultData.experience.status}</p>
-        <p><strong>Compétences détectées :</strong> ${resultData.candidateSkills.join(', ') || 'Aucune'}</p>
+      <div class="match-progress">
+        <span style="width: ${resultData.score}%"></span>
       </div>
 
-      <div class="skills-section">
-        <h4>Compétences correspondantes</h4>
-        <div class="skill-list">${matchedHTML}</div>
+      <div class="skills-block">
+        <div class="skills-header">Compétences correspondantes</div>
+        <div class="skill-list">
+          ${matchedHTML}
+        </div>
       </div>
 
-      <div class="skills-section">
-        <h4>Compétences manquantes</h4>
-        <div class="skill-list">${missingHTML}</div>
+      <div class="skills-block">
+        <div class="skills-header">Compétences manquantes</div>
+        <div class="skill-list">
+          ${missingHTML}
+        </div>
       </div>
 
-      <p class="analysis-note">${resultData.interpretation}</p>
-    </div>
+      <p style="font-size: 0.85rem; color: var(--text-soft); margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px;">
+        ℹ️ ${resultData.interpretation}
+      </p>
+    </article>
   `;
 }
 
 // ---------------------------------------------------------
-// 10) Exemple d'utilisation : bouton d'analyse
+// 10) Événement : bouton "Analyser le CV"
 // ---------------------------------------------------------
-// Ce code est à brancher sur le bouton "Analyser le CV".
+// Quand l'utilisateur clique sur le bouton, on récupère le texte
+// de l'offre et du CV, puis on lance l'analyse.
 document.addEventListener('DOMContentLoaded', function () {
   const analyzeBtn = document.getElementById('analyzeBtn');
 
   if (analyzeBtn) {
     analyzeBtn.addEventListener('click', function () {
+      // Récupère les textes des champs
       const jobDescription = document.getElementById('jobDescription')?.value || '';
       const cvText = document.getElementById('cvText')?.value || '';
 
+      // Vérifie que les deux champs sont remplis
       if (!jobDescription.trim() || !cvText.trim()) {
-        alert('Veuillez saisir l\'offre d\'emploi et le texte du CV.');
+        alert('Veuillez saisir l\'offre d\'emploi ET le texte du CV.');
         return;
       }
 
+      // Lance l'analyse
       const result = analyzeCVMatch(jobDescription, cvText);
-      renderResults(result);
+      
+      // Affiche les résultats dans le dashboard
+      displayMatchResults(result);
+      
+      // Scroll vers la section des résultats
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
     });
   }
 });
