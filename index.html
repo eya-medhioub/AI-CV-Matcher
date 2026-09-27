@@ -83,23 +83,26 @@
               id="jobDescription"
               rows="12"
               placeholder="Exemple : Nous recherchons un développeur front-end avec compétences en HTML, CSS, JavaScript, React, gestion de projet et communication."
-            >Nous recherchons un développeur front-end expérimenté en HTML, CSS, JavaScript, React, UX design et gestion de projet. Le candidat doit maîtriser le développement web responsive, les composants réutilisables, l’intégration d’API et le travail en équipe. Une bonne communication et une forte autonomie sont nécessaires.</textarea>
+            >Nous recherchons un développeur front-end expérimenté en HTML, CSS, JavaScript, React, UX design et gestion de projet. Le candidat doit maîtriser le développement web responsive, les intégrations API et la communication avec les équipes produit et design.</textarea>
             <button id="jobAnalyzeBtn" class="secondary-btn full-width">Analyser l’offre</button>
           </div>
 
           <div class="panel">
-            <h3>2. Ajouter un ou plusieurs CV</h3>
-            <label class="input-label" for="cvFiles">Importer des CV</label>
-            <label class="upload-box" for="cvFiles">
-              <input id="cvFiles" type="file" multiple accept=".txt,.md,.doc,.docx,.pdf" />
-              <span>Choisir plusieurs fichiers</span>
-            </label>
+            <h3>2. Ajouter un ou plusieurs candidats</h3>
 
-            <label class="input-label" for="cvText">ou coller le texte du CV</label>
+            <label class="input-label" for="candidateName">Nom du candidat</label>
+            <input
+              id="candidateName"
+              class="candidate-input"
+              type="text"
+              placeholder="Exemple : Yves Martin"
+            />
+
+            <label class="input-label" for="candidateCV">CV du candidat</label>
             <textarea
-              id="cvText"
+              id="candidateCV"
               rows="10"
-              placeholder="Collez ici le contenu d’un CV ou d’un profil candidat..."
+              placeholder="Collez ici le contenu du CV du candidat..."
             >Amélie Renaud - Développeuse front-end
 
 Expérience :
@@ -113,7 +116,12 @@ Compétences : HTML, CSS, JavaScript, React, TypeScript, UX design, intégration
 
 Niveau : Senior</textarea>
 
-            <button id="analyzeBtn" class="primary-btn full-width">Analyser le CV</button>
+            <div class="multi-actions">
+              <button id="addCandidateBtn" class="secondary-btn">Ajouter candidat</button>
+              <button id="analyzeBtn" class="primary-btn">Analyser les candidats</button>
+            </div>
+
+            <div id="candidateList" class="candidate-list"></div>
           </div>
         </div>
       </section>
