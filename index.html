@@ -35,14 +35,14 @@
     <main id="home">
       <section class="hero container">
         <div class="hero-content">
-          <span class="eyebrow">Outil d’aide au recrutement</span>
+          <span class="eyebrow">Outil d'aide au recrutement</span>
           <h1>AI CV Matcher</h1>
           <p>
-            Comparez automatiquement les compétences d’un candidat avec les exigences
-            d’une offre d’emploi pour repérer les meilleurs profils rapidement.
+            Comparez automatiquement les compétences d'un candidat avec les exigences
+            d'une offre d'emploi pour repérer les meilleurs profils rapidement.
           </p>
           <div class="hero-actions">
-            <a href="#analyze" class="primary-btn">Commencer l’analyse</a>
+            <a href="#analyze" class="primary-btn">Commencer l'analyse</a>
             <a href="#results" class="secondary-btn">Voir les résultats</a>
           </div>
           <ul class="hero-stats">
@@ -72,19 +72,20 @@
       <section id="analyze" class="analysis container">
         <div class="section-heading">
           <span class="eyebrow">Analyse</span>
-          <h2>Analyse de l’offre et des CV</h2>
+          <h2>Analyse de l'offre et des CV</h2>
         </div>
 
         <div class="analysis-grid">
           <div class="panel">
-            <h3>1. Saisir l’offre d’emploi</h3>
-            <label class="input-label" for="jobDescription">Description de l’offre</label>
+            <h3>1. Saisir l'offre d'emploi</h3>
+            <label class="input-label" for="jobDescription">Description de l'offre</label>
             <textarea
               id="jobDescription"
               rows="12"
               placeholder="Exemple : Nous recherchons un développeur front-end avec compétences en HTML, CSS, JavaScript, React, gestion de projet et communication."
             >Nous recherchons un développeur front-end expérimenté en HTML, CSS, JavaScript, React, UX design et gestion de projet. Le candidat doit maîtriser le développement web responsive, les intégrations API et la communication avec les équipes produit et design.</textarea>
-            <button id="jobAnalyzeBtn" class="secondary-btn full-width">Analyser l’offre</button>
+
+            <button id="jobAnalyzeBtn" class="secondary-btn full-width">Analyser l'offre</button>
           </div>
 
           <div class="panel">
@@ -109,10 +110,10 @@ Expérience :
 - 4 ans en développement web front-end
 - Maîtrise HTML5, CSS3, JavaScript, React, TypeScript
 - Création de sites responsive et accessibles
-- Collaboration avec UX/UI et intégration d’API
+- Collaboration avec UX/UI et intégration d'API
 - Gestion de projet et communication avec les équipes
 
-Compétences : HTML, CSS, JavaScript, React, TypeScript, UX design, intégration d’API, gestion de projet, communication.
+Compétences : HTML, CSS, JavaScript, React, TypeScript, UX design, intégration d'API, gestion de projet, communication.
 
 Niveau : Senior</textarea>
 
@@ -132,11 +133,15 @@ Niveau : Senior</textarea>
             <span class="eyebrow">Résultats</span>
             <h2>Dashboard de correspondance</h2>
           </div>
-          <button id="resetBtn" class="ghost-btn">Réinitialiser</button>
+          <div class="results-controls">
+            <button id="toggleViewBtn" class="ghost-btn">Passer au tableau</button>
+            <button id="resetBtn" class="ghost-btn">Réinitialiser</button>
+          </div>
         </div>
 
         <div id="resultSummary" class="summary-grid"></div>
         <div id="candidateGrid" class="candidate-grid"></div>
+        <div id="candidateTable" class="candidate-table-container" style="display: none;"></div>
       </section>
     </main>
 

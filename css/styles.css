@@ -341,6 +341,23 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.12);
 }
 
+.candidate-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: rgba(6, 12, 20, 0.72);
+  color: var(--text);
+  margin-bottom: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.candidate-input:focus {
+  border-color: rgba(94, 234, 212, 0.8);
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.12);
+}
+
 .upload-box {
   display: flex;
   align-items: center;
@@ -373,6 +390,57 @@ textarea:focus {
   margin-top: 18px;
 }
 
+.multi-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+.candidate-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.candidate-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.candidate-item-name {
+  font-weight: 600;
+  flex: 1;
+}
+
+.candidate-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.remove-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  background: rgba(248, 113, 113, 0.12);
+  color: #ffb0b0;
+  transition: background 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: rgba(248, 113, 113, 0.2);
+}
+
 .results {
   padding: 36px 0 70px;
 }
@@ -382,6 +450,13 @@ textarea:focus {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
+}
+
+.results-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .summary-grid {
@@ -424,6 +499,12 @@ textarea:focus {
   border-radius: 24px;
   padding: 22px;
   box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.candidate-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 25px 50px rgba(94, 234, 212, 0.15);
 }
 
 .candidate-header {
@@ -447,6 +528,7 @@ textarea:focus {
   padding: 8px 12px;
   font-size: 0.78rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .level {
@@ -519,6 +601,63 @@ textarea:focus {
   border: 1px solid rgba(248, 113, 113, 0.24);
 }
 
+.detail-button {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.candidate-table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(17, 28, 45, 0.7);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.comparison-table thead {
+  background: rgba(25, 40, 60, 0.9);
+}
+
+.comparison-table th {
+  padding: 18px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.comparison-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.comparison-table tbody tr:hover {
+  background: rgba(94, 234, 212, 0.05);
+}
+
+.comparison-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-score {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.table-skills {
+  max-width: 200px;
+  word-wrap: break-word;
+}
+
 .footer {
   border-top: 1px solid var(--border);
   padding: 20px 0 30px;
@@ -565,6 +704,20 @@ textarea:focus {
   .hero {
     padding-top: 42px;
   }
+
+  .multi-actions {
+    flex-direction: column;
+  }
+
+  .multi-actions button {
+    width: 100%;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 12px;
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 560px) {
@@ -591,5 +744,13 @@ textarea:focus {
   .footer-inner {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .results-controls {
+    width: 100%;
+  }
+
+  .results-controls button {
+    flex: 1;
   }
 }

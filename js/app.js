@@ -1,19 +1,3 @@
-// ---------------------------------------------------------
-// AI CV Matcher - logique de comparaison offre CV
-// ---------------------------------------------------------
-// Ce fichier contient les fonctions principales pour :
-// - lire le texte de l'offre et du CV
-// - détecter les compétences présentes
-// - comparer les compétences
-// - comparer l'expérience
-// - calculer un score indicatif
-// - afficher les résultats dans le dashboard
-
-// ---------------------------------------------------------
-// 1) Dictionnaire des compétences
-// ---------------------------------------------------------
-// Il contient les compétences les plus courantes dans les offres
-// et les CV. Une compétence peut avoir plusieurs variantes.
 const skillDictionary = [
   { label: 'HTML', aliases: ['html', 'html5', 'markup'] },
   { label: 'CSS', aliases: ['css', 'css3', 'sass', 'less', 'flexbox', 'grid'] },
@@ -37,12 +21,39 @@ const skillDictionary = [
   { label: 'Créativité', aliases: ['créativité', 'creativite', 'innovation', 'brainstorming'] }
 ];
 
-// ---------------------------------------------------------
-// 2) Fonction : normaliser le texte
-// ---------------------------------------------------------
-// Cette fonction transforme le texte pour faciliter les comparaisons.
-// On le met en minuscules, on enlève les accents, et on supprime
-// les caractères spéciaux inutiles.
+const defaultProfiles = [
+  {
+    name: 'Amélie Renaud',
+    experience: 'Senior',
+    text: `Amélie Renaud - Développeuse front-end
+    Expérience : 4 ans en développement web front-end
+    Compétences : HTML, CSS, JavaScript, React, TypeScript, UX design, intégration d'API, gestion de projet, communication.
+    Accueil des utilisateurs, tests unitaires, responsive design et collaboration avec les équipes design et produit.`
+  },
+  {
+    name: 'Nicolas Martin',
+    experience: 'Mid-level',
+    text: `Nicolas Martin - Développeur web
+    Expérience : 2 ans en développement front-end
+    Compétences : HTML, CSS, JavaScript, Git, SQL, API, responsive design.
+    Connaissance de la gestion de projet et des principes d'accessibilité.`
+  },
+  {
+    name: 'Sarah Benali',
+    experience: 'Junior',
+    text: `Sarah Benali - Assistante UX/UI
+    Expérience : 1 an en design produit et web
+    Compétences : UX design, UI design, communication, créativité, Figma, HTML, CSS.
+    Intérêt pour le design centré utilisateur et la collaboration avec les équipes de développement.`
+  }
+];
+
+const state = {
+  candidates: [],
+  results: [],
+  viewMode: 'cards'
+};
+
 function normalizeText(value) {
   return value
     .toLowerCase()
@@ -53,11 +64,6 @@ function normalizeText(value) {
     .trim();
 }
 
-// ---------------------------------------------------------
-// 3) Fonction : extraire les compétences d'un texte
-// ---------------------------------------------------------
-// On parcourt les compétences du dictionnaire et on vérifie si elles
-// apparaissent dans le texte. Une compétence peut avoir plusieurs variantes.
 function extractSkillsFromText(text) {
   const normalized = normalizeText(text);
   const matches = new Set();
@@ -77,14 +83,6 @@ function extractSkillsFromText(text) {
   return Array.from(matches);
 }
 
-// ---------------------------------------------------------
-// 4) Fonction : extraire l'expérience depuis un texte
-// ---------------------------------------------------------
-// On cherche des indices comme :
-// - 3 ans
-// - Senior
-// - Junior
-// - Mid-level
 function extractExperienceLevel(text) {
   const normalized = normalizeText(text);
 
@@ -111,174 +109,351 @@ function extractExperienceLevel(text) {
   return 'Expérience non précisée';
 }
 
-// ---------------------------------------------------------
-// 5) Fonction : comparer les compétences
-// ---------------------------------------------------------
-// On compare les compétences demandées par l'offre et celles présentes
-// dans le CV. Cela permet de savoir ce qui correspond et ce qui manque.
-function compareSkills(requiredSkills, candidateSkills) {
+function computeCandidateResult(candidateName, cvText, requiredSkills) {
+  const candidateSkills = extractSkillsFromText(cvText);
   const matchedSkills = requiredSkills.filter((skill) => candidateSkills.includes(skill));
   const missingSkills = requiredSkills.filter((skill) => !candidateSkills.includes(skill));
-
-  return { matchedSkills, missingSkills };
-}
-
-// ---------------------------------------------------------
-// 6) Fonction : comparer l'expérience demandée et l'expérience du candidat
-// ---------------------------------------------------------
-// On compare le niveau d'expérience mentionné dans l'offre et dans le CV.
-// L'objectif est d'aider à l'analyse, pas de décider automatiquement.
-function compareExperience(requiredText, candidateText) {
-  const requiredExp = extractExperienceLevel(requiredText);
-  const candidateExp = extractExperienceLevel(candidateText);
-
-  const order = ['Junior', 'Mid-level', 'Senior'];
-  const requiredIndex = order.indexOf(requiredExp);
-  const candidateIndex = order.indexOf(candidateExp);
-
-  const compatible = candidateIndex >= requiredIndex;
+  const score = requiredSkills.length
+    ? Math.min(100, Math.round((matchedSkills.length / requiredSkills.length) * 100))
+    : 0;
 
   return {
-    status: compatible ? 'Expérience compatible' : 'Expérience insuffisante',
-    required: requiredExp,
-    candidate: candidateExp,
-    compatible
-  };
-}
-
-// ---------------------------------------------------------
-// 7) Fonction : calculer le score de correspondance
-// ---------------------------------------------------------
-// Le score est un indicateur d'aide à l'analyse.
-// Il n'est pas une décision automatique de recrutement.
-function calculateMatchScore(requiredSkills, candidateSkills, experienceMatch) {
-  const totalSkills = requiredSkills.length || 1;
-  const ratio = (candidateSkills.filter((skill) => requiredSkills.includes(skill)).length / totalSkills) * 100;
-
-  let score = Math.round(ratio);
-
-  if (experienceMatch.compatible) {
-    score += 10;
-  }
-
-  if (candidateSkills.length > requiredSkills.length) {
-    score += 5;
-  }
-
-  if (score > 100) score = 100;
-  if (score < 0) score = 0;
-
-  return score;
-}
-
-// ---------------------------------------------------------
-// 8) Fonction principale : analyse complète de l'offre et du CV
-// ---------------------------------------------------------
-function analyzeCVMatch(jobDescription, cvText) {
-  const requiredSkills = extractSkillsFromText(jobDescription);
-  const candidateSkills = extractSkillsFromText(cvText);
-  const comparison = compareSkills(requiredSkills, candidateSkills);
-  const experienceComparison = compareExperience(jobDescription, cvText);
-  const score = calculateMatchScore(requiredSkills, candidateSkills, experienceComparison);
-
-  return {
-    requiredSkills,
-    candidateSkills,
-    matchedSkills: comparison.matchedSkills,
-    missingSkills: comparison.missingSkills,
-    experience: experienceComparison,
+    name: candidateName,
     score,
-    interpretation: `Indicateur d'aide à l'analyse et non une décision automatique de recrutement.`
+    matchedSkills,
+    missingSkills,
+    experience: extractExperienceLevel(cvText),
+    candidateSkills
   };
 }
 
-// ---------------------------------------------------------
-// 9) Fonction : afficher les résultats du dashboard
-// ---------------------------------------------------------
-// Cette fonction met à jour le DOM pour afficher les résultats de l'analyse.
-// CORRECTION : utilise #candidateGrid au lieu de #resultPanel
-function displayMatchResults(resultData) {
-  const candidateGrid = document.getElementById('candidateGrid');
+function getRequiredSkillsFromJob(jobText) {
+  const skills = extractSkillsFromText(jobText);
 
-  if (!candidateGrid) {
-    console.error('Conteneur #candidateGrid introuvable.');
-    return;
+  if (skills.length === 0) {
+    return [
+      'HTML',
+      'CSS',
+      'JavaScript',
+      'React',
+      'API',
+      'Gestion de projet',
+      'Communication'
+    ];
   }
 
-  const matchedHTML = resultData.matchedSkills.length
-    ? resultData.matchedSkills.map((skill) => `<span class="skill-pill match">${skill}</span>`).join('')
-    : `<span class="skill-pill missing">Aucune compétence correspondante</span>`;
+  return skills;
+}
 
-  const missingHTML = resultData.missingSkills.length
-    ? resultData.missingSkills.map((skill) => `<span class="skill-pill missing">${skill}</span>`).join('')
-    : `<span class="skill-pill match">Aucune compétence manquante</span>`;
+function setSummary(results) {
+  const summaryContainer = document.getElementById('resultSummary');
+  if (!summaryContainer) return;
 
-  // Affichage dans une seule carte pour l'analyse CV/Offre
-  candidateGrid.innerHTML = `
-    <article class="candidate-card">
-      <div class="candidate-header">
-        <div class="candidate-name">Résultat de l'analyse</div>
-        <span class="score-badge">${resultData.score}%</span>
-      </div>
+  const bestCandidate = results.reduce((best, candidate) => {
+    return candidate.score > best.score ? candidate : best;
+  }, results[0] || { score: 0, name: 'Aucun candidat' });
 
-      <div class="level">
-        <span class="dot"></span>
-        <span>${resultData.experience.status}</span>
-      </div>
+  const averageScore = results.length
+    ? Math.round(results.reduce((sum, candidate) => sum + candidate.score, 0) / results.length)
+    : 0;
 
-      <div class="match-progress">
-        <span style="width: ${resultData.score}%"></span>
-      </div>
-
-      <div class="skills-block">
-        <div class="skills-header">Compétences correspondantes</div>
-        <div class="skill-list">
-          ${matchedHTML}
-        </div>
-      </div>
-
-      <div class="skills-block">
-        <div class="skills-header">Compétences manquantes</div>
-        <div class="skill-list">
-          ${missingHTML}
-        </div>
-      </div>
-
-      <p style="font-size: 0.85rem; color: var(--text-soft); margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px;">
-        ℹ️ ${resultData.interpretation}
-      </p>
-    </article>
+  summaryContainer.innerHTML = `
+    <div class="summary-card">
+      <div class="metric">${results.length}</div>
+      <span>Candidats analysés</span>
+    </div>
+    <div class="summary-card">
+      <div class="metric">${averageScore}%</div>
+      <span>Score moyen</span>
+    </div>
+    <div class="summary-card">
+      <div class="metric">${bestCandidate.score}%</div>
+      <span>Meilleur profil : ${bestCandidate.name}</span>
+    </div>
   `;
 }
 
-// ---------------------------------------------------------
-// 10) Événement : bouton "Analyser le CV"
-// ---------------------------------------------------------
-// Quand l'utilisateur clique sur le bouton, on récupère le texte
-// de l'offre et du CV, puis on lance l'analyse.
+function renderCandidateList() {
+  const candidateList = document.getElementById('candidateList');
+  if (!candidateList) return;
+
+  if (!state.candidates.length) {
+    candidateList.innerHTML = '<div class="empty-state">Aucun candidat ajouté.</div>';
+    return;
+  }
+
+  candidateList.innerHTML = state.candidates
+    .map((candidate, index) => `
+      <div class="candidate-item">
+        <span class="candidate-item-name">${candidate.name}</span>
+        <div class="candidate-item-actions">
+          <button class="remove-btn" data-index="${index}">Supprimer</button>
+        </div>
+      </div>
+    `)
+    .join('');
+}
+
+function renderCardView(results) {
+  const candidateGrid = document.getElementById('candidateGrid');
+  if (!candidateGrid) return;
+
+  if (!results.length) {
+    candidateGrid.innerHTML = `
+      <div class="empty-state">
+        <h3>Aucun résultat pour le moment.</h3>
+        <p>Saisissez une offre d'emploi, ajoutez des candidats puis lancez l'analyse.</p>
+      </div>
+    `;
+    return;
+  }
+
+  candidateGrid.innerHTML = results.map((candidate) => {
+    const matchedList = candidate.matchedSkills.length ? candidate.matchedSkills : ['Aucune correspondance'];
+    const missingList = candidate.missingSkills.length ? candidate.missingSkills : ['Aucune compétence manquante'];
+
+    return `
+      <article class="candidate-card">
+        <div class="candidate-header">
+          <div class="candidate-name">${candidate.name}</div>
+          <span class="score-badge">${candidate.score}%</span>
+        </div>
+
+        <div class="level">
+          <span class="dot"></span>
+          <span>Niveau : ${candidate.experience}</span>
+        </div>
+
+        <div class="match-progress">
+          <span style="width: ${candidate.score}%"></span>
+        </div>
+
+        <div class="skills-block">
+          <div class="skills-header">Compétences correspondantes</div>
+          <div class="skill-list">
+            ${matchedList.map((skill) => `<span class="skill-pill match">${skill}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="skills-block">
+          <div class="skills-header">Compétences manquantes</div>
+          <div class="skill-list">
+            ${missingList.map((skill) => `<span class="skill-pill missing">${skill}</span>`).join('')}
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function renderTableView(results) {
+  const tableContainer = document.getElementById('candidateTable');
+  if (!tableContainer) return;
+
+  if (!results.length) {
+    tableContainer.innerHTML = `
+      <div class="empty-state">
+        <h3>Aucun résultat pour le moment.</h3>
+        <p>Saisissez une offre d'emploi, ajoutez des candidats puis lancez l'analyse.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const tableHTML = `
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Candidat</th>
+          <th>Score</th>
+          <th>Expérience</th>
+          <th>Compétences correspondantes</th>
+          <th>Compétences manquantes</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${results.map((candidate) => `
+          <tr>
+            <td><strong>${candidate.name}</strong></td>
+            <td class="table-score">${candidate.score}%</td>
+            <td>${candidate.experience}</td>
+            <td class="table-skills">${candidate.matchedSkills.join(', ') || 'Aucune'}</td>
+            <td class="table-skills">${candidate.missingSkills.join(', ') || 'Aucune'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+
+  tableContainer.innerHTML = tableHTML;
+}
+
+function renderResults(results) {
+  setSummary(results);
+
+  if (state.viewMode === 'cards') {
+    renderCardView(results);
+  } else {
+    renderTableView(results);
+  }
+}
+
+function toggleViewMode() {
+  state.viewMode = state.viewMode === 'cards' ? 'table' : 'cards';
+
+  const cardGrid = document.getElementById('candidateGrid');
+  const tableContainer = document.getElementById('candidateTable');
+  const toggleBtn = document.getElementById('toggleViewBtn');
+
+  if (state.viewMode === 'cards') {
+    cardGrid.style.display = 'grid';
+    tableContainer.style.display = 'none';
+    toggleBtn.textContent = 'Passer au tableau';
+    renderCardView(state.results);
+  } else {
+    cardGrid.style.display = 'none';
+    tableContainer.style.display = 'block';
+    toggleBtn.textContent = 'Passer aux cartes';
+    renderTableView(state.results);
+  }
+}
+
+function addCandidate() {
+  const name = document.getElementById('candidateName').value.trim();
+  const cvText = document.getElementById('candidateCV').value.trim();
+
+  if (!name) {
+    alert('Veuillez saisir le nom du candidat.');
+    return;
+  }
+
+  if (!cvText) {
+    alert('Veuillez saisir le CV du candidat.');
+    return;
+  }
+
+  const candidate = {
+    id: Date.now(),
+    name,
+    cvText
+  };
+
+  state.candidates.push(candidate);
+  renderCandidateList();
+
+  document.getElementById('candidateName').value = '';
+  document.getElementById('candidateCV').value = '';
+
+  alert(`Candidat "${name}" ajouté avec succès!`);
+}
+
+function removeCandidate(index) {
+  const name = state.candidates[index].name;
+  state.candidates.splice(index, 1);
+  renderCandidateList();
+  alert(`Candidat "${name}" supprimé.`);
+}
+
+function analyzeAllCandidates() {
+  const jobDescription = document.getElementById('jobDescription').value.trim();
+  const requiredSkills = getRequiredSkillsFromJob(jobDescription);
+
+  if (!jobDescription) {
+    alert('Veuillez saisir une offre d\'emploi avant de lancer l\'analyse.');
+    return;
+  }
+
+  if (!state.candidates.length) {
+    alert('Veuillez ajouter au moins un candidat.');
+    return;
+  }
+
+  const results = state.candidates.map((candidate) => {
+    return computeCandidateResult(candidate.name, candidate.cvText, requiredSkills);
+  });
+
+  state.results = results.sort((a, b) => b.score - a.score);
+  renderResults(state.results);
+
+  document.querySelector('#results').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetAll() {
+  state.candidates = [];
+  state.results = [];
+  state.viewMode = 'cards';
+
+  document.getElementById('jobDescription').value = `Nous recherchons un développeur front-end expérimenté en HTML, CSS, JavaScript, React, UX design et gestion de projet. Le candidat doit maîtriser le développement web responsive, les intégrations API et la communication avec les équipes produit et design.`;
+
+  document.getElementById('candidateName').value = '';
+  document.getElementById('candidateCV').value = `Amélie Renaud - Développeuse front-end
+
+Expérience :
+- 4 ans en développement web front-end
+- Maîtrise HTML5, CSS3, JavaScript, React, TypeScript
+- Création de sites responsive et accessibles
+- Collaboration avec UX/UI et intégration d'API
+- Gestion de projet et communication avec les équipes
+
+Compétences : HTML, CSS, JavaScript, React, TypeScript, UX design, intégration d'API, gestion de projet, communication.
+
+Niveau : Senior`;
+
+  const candidateGrid = document.getElementById('candidateGrid');
+  candidateGrid.style.display = 'grid';
+  document.getElementById('candidateTable').style.display = 'none';
+  document.getElementById('toggleViewBtn').textContent = 'Passer au tableau';
+
+  renderCandidateList();
+  renderResults([]);
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+  const addCandidateBtn = document.getElementById('addCandidateBtn');
   const analyzeBtn = document.getElementById('analyzeBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const toggleViewBtn = document.getElementById('toggleViewBtn');
+  const jobAnalyzeBtn = document.getElementById('jobAnalyzeBtn');
 
-  if (analyzeBtn) {
-    analyzeBtn.addEventListener('click', function () {
-      // Récupère les textes des champs
-      const jobDescription = document.getElementById('jobDescription')?.value || '';
-      const cvText = document.getElementById('cvText')?.value || '';
+  if (jobAnalyzeBtn) {
+    jobAnalyzeBtn.addEventListener('click', function () {
+      const jobText = document.getElementById('jobDescription').value.trim();
 
-      // Vérifie que les deux champs sont remplis
-      if (!jobDescription.trim() || !cvText.trim()) {
-        alert('Veuillez saisir l\'offre d\'emploi ET le texte du CV.');
+      if (!jobText) {
+        alert('Veuillez renseigner l\'offre d\'emploi.');
         return;
       }
 
-      // Lance l'analyse
-      const result = analyzeCVMatch(jobDescription, cvText);
-      
-      // Affiche les résultats dans le dashboard
-      displayMatchResults(result);
-      
-      // Scroll vers la section des résultats
-      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+      const requiredSkills = getRequiredSkillsFromJob(jobText);
+      const summary = requiredSkills.slice(0, 6).join(', ');
+      alert(`Offre analysée. Compétences clés détectées : ${summary}`);
     });
   }
+
+  if (addCandidateBtn) {
+    addCandidateBtn.addEventListener('click', addCandidate);
+  }
+
+  if (analyzeBtn) {
+    analyzeBtn.addEventListener('click', analyzeAllCandidates);
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener('click', resetAll);
+  }
+
+  if (toggleViewBtn) {
+    toggleViewBtn.addEventListener('click', toggleViewMode);
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('remove-btn')) {
+      const index = parseInt(e.target.dataset.index);
+      removeCandidate(index);
+    }
+  });
+
+  document.getElementById('candidateList').innerHTML = '<div class="empty-state">Aucun candidat ajouté.</div>';
+  document.getElementById('candidateGrid').innerHTML = '<div class="empty-state">Aucun candidat pour le moment.</div>';
+  renderCandidateList();
 });
