@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI CV Matcher</title>
+    <meta
+      name="description"
+      content="AI CV Matcher - Analyse de correspondance entre un CV et une offre d'emploi."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <nav class="navbar container">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <span>CV Matcher</span>
+        </div>
+        <div class="nav-links">
+          <a href="#home">Accueil</a>
+          <a href="#analyze">Analyse</a>
+          <a href="#results">Résultats</a>
+        </div>
+        <button class="nav-cta">Projet universitaire</button>
+      </nav>
+    </header>
+
+    <main id="home">
+      <section class="hero container">
+        <div class="hero-content">
+          <span class="eyebrow">Outil d’aide au recrutement</span>
+          <h1>AI CV Matcher</h1>
+          <p>
+            Comparez automatiquement les compétences d’un candidat avec les exigences
+            d’une offre d’emploi pour repérer les meilleurs profils rapidement.
+          </p>
+          <div class="hero-actions">
+            <a href="#analyze" class="primary-btn">Commencer l’analyse</a>
+            <a href="#results" class="secondary-btn">Voir les résultats</a>
+          </div>
+          <ul class="hero-stats">
+            <li><strong>100%</strong><span>Web</span></li>
+            <li><strong>HTML</strong><span>CSS</span></li>
+            <li><strong>JS</strong><span>Client-side</span></li>
+          </ul>
+        </div>
+
+        <div class="hero-panel">
+          <div class="mini-card highlight">
+            <span class="label">Candidat le plus adapté</span>
+            <strong>Amélie R.</strong>
+            <small>Score : 92%</small>
+          </div>
+          <div class="mini-card">
+            <span class="label">Compétences clés</span>
+            <div class="tags">
+              <span>JavaScript</span>
+              <span>SQL</span>
+              <span>UI/UX</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="analyze" class="analysis container">
+        <div class="section-heading">
+          <span class="eyebrow">Analyse</span>
+          <h2>Analyse de l’offre et des CV</h2>
+        </div>
+
+        <div class="analysis-grid">
+          <div class="panel">
+            <h3>1. Saisir l’offre d’emploi</h3>
+            <label class="input-label" for="jobDescription">Description de l’offre</label>
+            <textarea
+              id="jobDescription"
+              rows="12"
+              placeholder="Exemple : Nous recherchons un développeur front-end avec compétences en HTML, CSS, JavaScript, React, gestion de projet et communication."
+            >Nous recherchons un développeur front-end expérimenté en HTML, CSS, JavaScript, React, UX design et gestion de projet. Le candidat doit maîtriser le développement web responsive, les composants réutilisables, l’intégration d’API et le travail en équipe. Une bonne communication et une forte autonomie sont nécessaires.</textarea>
+            <button id="jobAnalyzeBtn" class="secondary-btn full-width">Analyser l’offre</button>
+          </div>
+
+          <div class="panel">
+            <h3>2. Ajouter un ou plusieurs CV</h3>
+            <label class="input-label" for="cvFiles">Importer des CV</label>
+            <label class="upload-box" for="cvFiles">
+              <input id="cvFiles" type="file" multiple accept=".txt,.md,.doc,.docx,.pdf" />
+              <span>Choisir plusieurs fichiers</span>
+            </label>
+
+            <label class="input-label" for="cvText">ou coller le texte du CV</label>
+            <textarea
+              id="cvText"
+              rows="10"
+              placeholder="Collez ici le contenu d’un CV ou d’un profil candidat..."
+            >Amélie Renaud - Développeuse front-end
+
+Expérience :
+- 4 ans en développement web front-end
+- Maîtrise HTML5, CSS3, JavaScript, React, TypeScript
+- Création de sites responsive et accessibles
+- Collaboration avec UX/UI et intégration d’API
+- Gestion de projet et communication avec les équipes
+
+Compétences : HTML, CSS, JavaScript, React, TypeScript, UX design, intégration d’API, gestion de projet, communication.
+
+Niveau : Senior</textarea>
+
+            <button id="analyzeBtn" class="primary-btn full-width">Analyser le CV</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="results" class="results container">
+        <div class="section-heading split-heading">
+          <div>
+            <span class="eyebrow">Résultats</span>
+            <h2>Dashboard de correspondance</h2>
+          </div>
+          <button id="resetBtn" class="ghost-btn">Réinitialiser</button>
+        </div>
+
+        <div id="resultSummary" class="summary-grid"></div>
+        <div id="candidateGrid" class="candidate-grid"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <p>AI CV Matcher — Projet universitaire</p>
+        <span>HTML • CSS • JavaScript</span>
+      </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
