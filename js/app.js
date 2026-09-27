@@ -188,7 +188,7 @@ function analyzeCVMatch(jobDescription, cvText) {
     missingSkills: comparison.missingSkills,
     experience: experienceComparison,
     score,
-    interpretation: 'Indicateur d'aide à l'analyse et non une décision automatique de recrutement.'
+    interpretation: `Indicateur d'aide à l'analyse et non une décision automatique de recrutement.`
   };
 }
 
